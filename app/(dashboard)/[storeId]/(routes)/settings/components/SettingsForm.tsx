@@ -6,6 +6,9 @@ import { Trash } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import { toast } from "react-hot-toast";
+import axios from "axios";
+import { useParams, useRouter } from "next/navigation";
 
 import { Heading } from "@/components/ui/heading";
 import { Button } from "@/components/ui/button";
@@ -34,13 +37,26 @@ const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const params = useParams();
+  const router = useRouter();
+
   const form = useForm<SettingFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData,
   });
 
   const onSubmit = async (data: SettingFormValues) => {
-    console.log(data);
+    try {
+      setLoading(true);
+      await axios.patch(`/api/stores/${params.storeId}`, data);
+      router.refresh();
+
+      toast.success("Store updated");
+    } catch (error) {
+      toast.error("Someting went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -48,7 +64,12 @@ const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
       <div className="flex items-center justify-between">
         <Heading title="Settings" description="Manage store preferences" />
 
-        <Button variant={"destructive"} size={"icon"} onClick={() => {}}>
+        <Button
+          disabled={loading}
+          variant={"destructive"}
+          size={"icon"}
+          onClick={() => setOpen(true)}
+        >
           <Trash className="h-4 w-4" />
         </Button>
       </div>
