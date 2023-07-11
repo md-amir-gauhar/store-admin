@@ -3,7 +3,7 @@ import { redirect, useParams } from "next/navigation";
 
 import prismadb from "@/lib/prismadb";
 
-import SettingsForm from "./components/SettingsForm";
+import SettingsForm from "./components/settings-form";
 
 interface SettingsPageProps {
   params: { storeId: string };
